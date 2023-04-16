@@ -1,8 +1,8 @@
 '''
   # Próximos passos:
-  - Separar uma função só para a travessia dos carros na ponte dentro da classe Car
-  - Definir ponto de trava
-  - Definir ponto de liberação
+  OK - Separar uma função só para a travessia dos carros na ponte dentro da classe Car
+  OK - Definir ponto de trava
+  OK - Definir ponto de liberação
   
   # Fluxo:
     - Carro chega até o inicio da ponte
@@ -15,40 +15,69 @@
 '''
 
 from threading import Thread, Condition, current_thread
-from time import sleep
+from time import sleep, time
 from random import randint, choice
 
 # Consts variables
 N_CARS               = 100 # Number of cars
-P_THROUGH            = 10  # Time pass through the bridge
+P_THROUGH            = 5  # Time pass through the bridge
 T_SPACE_BETWEEN_CARS = 2   # Time space between the cars
 
+# Global variables
+lock       = Condition()
+directions = ['right', 'left']
+bridge     = []
+time_start = 0
+time_end   = 0
+
 class Car:
-  def __init__(self):
-    self.number           = current_thread()
-    self.direction        = choice(['right', 'left'])
-    self.time_for_comming = randint(2, 6) # Tempo de travessia do carro
+  def __init__(self, direction):
+    self.direction        = direction
+    self.time_for_comming = randint(1, 3) # Tempo de travessia do carro
+
+  def crossing_process(self):
+    # time_start = time()
+    self.to_enter_the_bridge()
+    self.to_out_the_bridge()
+    # time_end = time()
   
-  def enter_the_bridge(self, lock):
-    global sigle_lane_bridge
+  # Function to start get in the bridge process
+  def to_enter_the_bridge(self):
 
     with lock:
       lock.acquire()
 
-      while sigle_lane_bridge[-1].direction != self.direction:
-        lock.wait()
-      
-      print(f'Car {self.number} enter in the bridge on the {self.direction}')
-      sigle_lane_bridge.append(self)
+      if len(bridge) == 0:
+        self.speed_up()
+      else:
+        while bridge[-1].direction != self.direction:
+          print(f'Car {self.direction} in opposite directions, putting on hold...')
+          lock.wait()
+
+          self.speed_up()
+  
+  # Function to start get out the bridge process
+  def to_out_the_bridge(self):
+
+    with lock:
+      lock.acquire()
+
       sleep(self.time_for_comming)
-      sigle_lane_bridge.pop()
+      bridge.pop(0)                                                                     # Car finally out
+      print(f'{current_thread().name} took {self.time_for_comming} seconds to exit')
+      lock.notify_all()
+      lock.release()
+  
+  def speed_up(self):
+    print(f'{current_thread().name} can speed up on the {self.direction}')
+    sleep(1)                                                                            # Time for waiting comming a new car
+    bridge.append(self)                                                                 # Car get in
+    lock.notify_all()
+    lock.release()
 
 if __name__ == "__main__":
-  lock = Condition()
-  sigle_lane_bridge = []
 
-  for i in range(0, 2):
-    new_car = Car()
-    new_car_thread = Thread(name=f'Car {i}', target=new_car.enter_the_bridge, args=(lock, ))
+  for i in range(0, N_CARS):
+    new_car_thread = Thread(name=f'Car {i}', target=Car(directions[i%2]).crossing_process, args=())
     sleep(T_SPACE_BETWEEN_CARS)
     new_car_thread.start()
