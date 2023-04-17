@@ -1,19 +1,3 @@
-'''
-  # Próximos passos:
-  OK - Separar uma função só para a travessia dos carros na ponte dentro da classe Car
-  OK - Definir ponto de trava
-  OK - Definir ponto de liberação
-  
-  # Fluxo:
-    - Carro chega até o inicio da ponte
-    - Checa se a ponte está vazia
-      + caso sim acelera e lock.release() e bridge.pop()
-      + caso não
-      + Confere se o último carro tem a mesma direção que ele
-        ** caso sim carro acelera e lock.release() e libera bridge.pop()
-        ** caso não carro espera lock.wait()
-'''
-
 from threading import Thread, Condition, current_thread, enumerate
 from time import sleep, time
 from random import randint
@@ -38,7 +22,7 @@ total_time_right = 0
 class Car:
   def __init__(self, direction):
     self.direction        = direction
-    self.time_for_comming = randint(1, 3) # Tempo de travessia do carro
+    self.time_for_comming = randint(1, 3) # Time crossing
 
   def crossing_process(self):
     global total_time_left
@@ -112,11 +96,3 @@ if __name__ == "__main__":
   creating_cars()
   starting_cars()
   printing_results()
-
-  # print(len(enumerate()))
-  # while len(enumerate()) > 0:
-    # printing_results()
-    # print(f'Total time for left cars: {total_time_left}')
-    # print(f'Total time for right cars: {total_time_right}')
-    # print(f'Media time left: {total_time_left/N_CARS}')
-    # print(f'Media time right: {total_time_right/N_CARS}')
