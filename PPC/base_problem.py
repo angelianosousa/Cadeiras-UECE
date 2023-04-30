@@ -14,26 +14,29 @@ from time import sleep, time
 from random import randint
 
 # Consts variables
-N_CARS               = 100 # Number of cars
+N_CARS               = 5 # Number of cars
 P_THROUGH            = 5   # Time pass through the bridge
 T_SPACE_BETWEEN_CARS = 2   # Time space between the cars
 
-# Global variables
-lock       = Condition()
-directions = ['right', 'left']
-bridge     = []
-cars       = []
-
 class Car:
-  def __init__(self, direction):
+  def __init__(self, direction, number):
+    self.number           = number
     self.direction        = direction
     self.time_for_comming = randint(1, 3) # Tempo de travessia do carro
 
   def crossing_process(self):
+    global cars_left
+    global cars_right
+
     self.to_enter_the_bridge()
     self.to_out_the_bridge()
+
+    if self.direction == 'left':
+      cars_left += 1
+    else:
+      cars_right += 1
   
-  # Function to start get in the bridge process
+  # Function to start get in the bridge process - Productor
   def to_enter_the_bridge(self):
 
     with lock:
@@ -43,12 +46,12 @@ class Car:
         self.speed_up()
       else:
         while bridge[-1].direction != self.direction:
-          print(f'#== Car {self.direction} in opposite directions, putting on hold... ==#')
+          print(f'#== Car {self.number} in opposite directions, putting on hold... ==#')
           lock.wait()
 
           self.speed_up()
   
-  # Function to start get out the bridge process
+  # Function to start get out the bridge process - Consumer
   def to_out_the_bridge(self):
 
     with lock:
@@ -56,12 +59,13 @@ class Car:
 
       sleep(self.time_for_comming)
       bridge.pop(0)                                                                     # Car finally out
-      print(f'{current_thread().name} took {self.time_for_comming} seconds to exit')
+      print(f'{current_thread().name} has leave...')
+      print(21*'==')
       lock.notify_all()
       lock.release()
   
   def speed_up(self):
-    print(f'{current_thread().name} can speed up on the {self.direction}')
+    print(f'{current_thread().name} can leave in {self.time_for_comming} seconds on the #{self.direction}')
     sleep(1)                                                                            # Time for waiting comming a new car
     bridge.append(self)                                                                 # Car get in
     lock.notify_all()
@@ -69,7 +73,7 @@ class Car:
 
 def creating_cars():
   for i in range(0, N_CARS):
-    new_car_thread = Thread(name=f'Car {i}', target=Car(directions[i%2]).crossing_process, args=())
+    new_car_thread = Thread(name=f'Car {i}', target=Car(directions[i%2], i).crossing_process, args=())
     cars.append(new_car_thread)
   
 def starting_cars():
@@ -80,7 +84,21 @@ def starting_cars():
   for i in range(0, N_CARS):
     cars[i].join()
 
+def priting_results():
+  print(f'Nº cars left: {cars_left}')
+  print(f'Nº cars right: {cars_right}')
+
 if __name__ == "__main__":
+  # Time variables
+  cars_left  = 0
+  cars_right = 0
+
+  # Global variables
+  lock       = Condition()
+  directions = ['right', 'left']
+  bridge     = []
+  cars       = []
 
   creating_cars()
   starting_cars()
+  priting_results()
