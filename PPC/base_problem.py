@@ -9,18 +9,23 @@
         ** caso não carro espera lock.wait()
 '''
 
-from threading import Thread, Condition, current_thread, enumerate
+# TODO | Adicionar uma metodo a classe Bridges para adicionar e remover carros de forma atômica
+
+from threading import Thread, Condition, get_native_id
 from time import sleep, time
 from random import randint
 
 # Consts variables
-N_CARS               = 5 # Number of cars
+N_CARS               = 100 # Number of cars
 P_THROUGH            = 5   # Time pass through the bridge
-T_SPACE_BETWEEN_CARS = 2   # Time space between the cars
+T_SPACE_BETWEEN_CARS = 1   # Time space between the cars
 
-class Car:
-  def __init__(self, direction, number):
-    self.number           = number
+class Bridges():
+  def __init__(self):
+    self.lane = []
+
+class Cars:
+  def __init__(self, direction):
     self.direction        = direction
     self.time_for_comming = randint(1, 3) # Tempo de travessia do carro
 
@@ -42,14 +47,16 @@ class Car:
     with lock:
       lock.acquire()
 
-      if len(bridge) == 0:
+      if len(bridge.lane) == 0:
         self.speed_up()
       else:
-        while bridge[-1].direction != self.direction:
-          print(f'#== Car {self.number} in opposite directions, putting on hold... ==#')
+        if bridge.lane[-1].direction != self.direction and bridge.lane[-1].time_for_comming > self.time_for_comming:
+          print(f'# Car {get_native_id()} on {self.direction} putting on hold...')
+          print(f'Car {get_native_id()} need {self.time_for_comming} seconds to across...')
           lock.wait()
 
-          self.speed_up()
+        sleep(1)
+        self.speed_up()
   
   # Function to start get out the bridge process - Consumer
   def to_out_the_bridge(self):
@@ -58,23 +65,26 @@ class Car:
       lock.acquire()
 
       sleep(self.time_for_comming)
-      bridge.pop(0)                                                                     # Car finally out
-      print(f'{current_thread().name} has leave...')
-      print(21*'==')
-      lock.notify_all()
-      lock.release()
+      bridge.lane.pop(0) # Car finally out
+
+      print(f'Car {get_native_id()} was left now...')
   
   def speed_up(self):
-    print(f'{current_thread().name} can leave in {self.time_for_comming} seconds on the #{self.direction}')
-    sleep(1)                                                                            # Time for waiting comming a new car
-    bridge.append(self)                                                                 # Car get in
-    lock.notify_all()
+    global cars_count
+
+    cars_count += 1
+    sleep(1)
+    print(f'================================= {cars_count} ==============================')
+
+    print(f'Car {get_native_id()} on the bridge, can leave in *{self.time_for_comming} seconds* on the #{self.direction}')
+    bridge.lane.append(self) # Car get in
+    lock.notify()
     lock.release()
 
 def creating_cars():
   for i in range(0, N_CARS):
-    new_car_thread = Thread(name=f'Car {i}', target=Car(directions[i%2], i).crossing_process, args=())
-    cars.append(new_car_thread)
+    new_car = Thread(name=f'Car {i}', target=Cars(directions[i%2]).crossing_process, args=())
+    cars.append(new_car)
   
 def starting_cars():
   for i in range(0, N_CARS):
@@ -87,17 +97,24 @@ def starting_cars():
 def priting_results():
   print(f'Nº cars left: {cars_left}')
   print(f'Nº cars right: {cars_right}')
+  # print(f'Minimal time for wait: {min_wait}')
 
 if __name__ == "__main__":
-  # Time variables
+  # Count cars variables
   cars_left  = 0
   cars_right = 0
 
+  # Time variables
+  min_wait = 0
+  max_wait = 0
+  # max_time_on_bridge = 0
+
   # Global variables
   lock       = Condition()
+  bridge     = Bridges()
   directions = ['right', 'left']
-  bridge     = []
   cars       = []
+  cars_count = 0
 
   creating_cars()
   starting_cars()
