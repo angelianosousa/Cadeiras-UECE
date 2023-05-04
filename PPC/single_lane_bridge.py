@@ -1,8 +1,8 @@
 from time import time, sleep
-from random import randint, choice
+from random import randint
 
 # Const variables
-N_CARS    = 100 # Cars numbers
+N_CARS    = 10 # Cars numbers
 TIME_PASS = 5   # Time for a car pass thought bridge
 
 # Count variables
@@ -13,6 +13,7 @@ cars_left  = 0
 min_wait   = 0
 max_wait   = 0
 total_time = 0
+directions = ['left', 'right']
 
 class Cars:
   def __init__(self, direction, number):
@@ -94,14 +95,14 @@ def enter_bridge(condition, bridge):
   car_number = 1
     
   while bridge.cars_enter < N_CARS:
-    car = Cars(choice(['left', 'right']), car_number)
+    car = Cars(directions[car_number%2], car_number)
     car_number += 1
 
     with condition:
       condition.acquire()
 
       # Check if the cars are in opposite sides
-      if len(bridge.lane) > 0 and bridge.lane[0].direction == car.direction:
+      if len(bridge.lane) > 0 and bridge.lane[0].direction == car.direction and bridge.lane[0].time_arrive > car.time_arrive:
         print(f'Next car {car.number} has the same direction than Car {bridge.lane[0].number}')
         print('Putting on hold...')
         condition.wait()
@@ -109,9 +110,8 @@ def enter_bridge(condition, bridge):
       car.time_start_wait = time()
       sleep(car.time_arrive)
       bridge.lane.append(car)
-      car.time_enter = time()
-
       bridge.cars_enter += 1
+
       print(f'Car {car.number} enter bridge on #{car.direction} with {car.time_arrive} seconds to arrive')
       condition.notify_all()
       condition.release()
@@ -132,3 +132,4 @@ def print_results(condition, bridge):
     print(f'Min time wait: {min_wait} seconds')
     print(f'Max time wait: {max_wait} seconds')
     print(f'Med time wait: {round(total_time/N_CARS, 2)} seconds')
+    print(f'Total time of execution: {round(total_time, 2)} seconds')
