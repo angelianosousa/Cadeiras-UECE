@@ -69,31 +69,61 @@ class Bridges:
       print('Putting on hold...')
       condition.wait()
 
-  def car_pass_in(self, condition, car):
+  def car_pass_in(self, car):
     car.time_start_wait = time()
     sleep(car.time_arrive)
     self.lane.append(car)
     self.cars_enter += 1
 
     print(f'Car {car.number} enter bridge on #{car.direction} with {car.time_arrive} seconds to arrive')
-    condition.notify_all()
-    condition.release()
   
-  def car_pass_out(self, condition):
+  def car_pass_out(self):
     car = self.lane[0]
 
     self.count_cars() # Just count cars
 
     sleep(TIME_PASS)
     self.lane.pop(0)
-    self.cars_out += 1          # Count cars out
+    self.cars_out += 1            # Count cars out
     car.time_leave_wait = time()  # Count time leave the bridge
     car.count_time_metrics()      # Build statistics
 
     print(f'Car {car.number} leave bridge on #{car.direction}')
     print(f'Car {car.number} time wait: {round(car.time_leave_wait - car.time_start_wait, 2)} seconds')
-    condition.notify_all()
-    condition.release()
+  
+  def mecanism_for_five_cars(self, car):
+    if self.cars_enter > 0 and self.cars_enter % 5 == 0:
+      print('Five cars have pass..')
+      print(f'Car {car.number} #{car.direction} was stopped...')
+      print('Change the direction of the bridge...')
+      sleep(1)
+      new_car_direction = 'right' if car.direction == 'left' else 'left'
+
+      new_car = Cars(new_car_direction, car.number+1)
+      print(f'Car {new_car.number} is the next...')
+      sleep(1)
+      self.car_pass_in(new_car)
+
+def enter_bridge(condition, bridge, change_direction_with_five_cars = False):
+
+  car_number = 1
+    
+  while bridge.cars_enter < N_CARS:
+    car = Cars(directions[car_number%2], car_number)
+    car_number += 1
+
+    with condition:
+      condition.acquire()
+
+      # Check if pass five cars
+      bridge.mecanism_for_five_cars(car) if change_direction_with_five_cars == True else ''
+
+      # Check if the cars are in opposite sides
+      bridge.check_opposite_cars(condition, car)
+
+      bridge.car_pass_in(car)
+      condition.notify_all()
+      condition.release()
 
 def leave_bridge(condition, bridge):
 
@@ -107,23 +137,9 @@ def leave_bridge(condition, bridge):
         print(20*'-=-')
         condition.wait()
 
-      bridge.car_pass_out(condition)
-
-def enter_bridge(condition, bridge):
-
-  car_number = 1
-    
-  while bridge.cars_enter < N_CARS:
-    car = Cars(directions[car_number%2], car_number)
-    car_number += 1
-
-    with condition:
-      condition.acquire()
-
-      # Check if the cars are in opposite sides
-      bridge.check_opposite_cars(condition, car)
-
-      bridge.car_pass_in(condition, car)
+      bridge.car_pass_out()
+      condition.notify_all()
+      condition.release()
 
 def print_results(condition, bridge):
   global cars_left
