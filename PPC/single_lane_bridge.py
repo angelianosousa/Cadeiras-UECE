@@ -2,7 +2,7 @@ from time import time, sleep
 from random import randint
 
 # Const variables
-N_CARS    = 10 # Cars numbers
+N_CARS    = 100 # Cars numbers
 TIME_PASS = 5   # Time for a car pass thought bridge
 
 # Count variables
@@ -62,6 +62,38 @@ class Bridges:
       cars_left += 1
     else:
       cars_right += 1
+  
+  def check_opposite_cars(self, condition, car):
+    if len(self.lane) > 0 and self.lane[0].direction == car.direction and self.lane[0].time_arrive > car.time_arrive:
+      print(f'Next car {car.number} has the same direction than Car {self.lane[0].number}')
+      print('Putting on hold...')
+      condition.wait()
+
+  def car_pass_in(self, condition, car):
+    car.time_start_wait = time()
+    sleep(car.time_arrive)
+    self.lane.append(car)
+    self.cars_enter += 1
+
+    print(f'Car {car.number} enter bridge on #{car.direction} with {car.time_arrive} seconds to arrive')
+    condition.notify_all()
+    condition.release()
+  
+  def car_pass_out(self, condition):
+    car = self.lane[0]
+
+    self.count_cars() # Just count cars
+
+    sleep(TIME_PASS)
+    self.lane.pop(0)
+    self.cars_out += 1          # Count cars out
+    car.time_leave_wait = time()  # Count time leave the bridge
+    car.count_time_metrics()      # Build statistics
+
+    print(f'Car {car.number} leave bridge on #{car.direction}')
+    print(f'Car {car.number} time wait: {round(car.time_leave_wait - car.time_start_wait, 2)} seconds')
+    condition.notify_all()
+    condition.release()
 
 def leave_bridge(condition, bridge):
 
@@ -75,20 +107,7 @@ def leave_bridge(condition, bridge):
         print(20*'-=-')
         condition.wait()
 
-      car = bridge.lane[0]
-
-      bridge.count_cars() # Just count cars
-
-      sleep(TIME_PASS)
-      bridge.lane.pop(0)
-      bridge.cars_out += 1          # Count cars out
-      car.time_leave_wait = time()  # Count time leave the bridge
-      car.count_time_metrics()      # Build statistics
-
-      print(f'Car {car.number} leave bridge on #{car.direction}')
-      print(f'Time wait: {round(car.time_leave_wait - car.time_start_wait, 2)} seconds')
-      condition.notify_all()
-      condition.release()
+      bridge.car_pass_out(condition)
 
 def enter_bridge(condition, bridge):
 
@@ -102,19 +121,9 @@ def enter_bridge(condition, bridge):
       condition.acquire()
 
       # Check if the cars are in opposite sides
-      if len(bridge.lane) > 0 and bridge.lane[0].direction == car.direction and bridge.lane[0].time_arrive > car.time_arrive:
-        print(f'Next car {car.number} has the same direction than Car {bridge.lane[0].number}')
-        print('Putting on hold...')
-        condition.wait()
+      bridge.check_opposite_cars(condition, car)
 
-      car.time_start_wait = time()
-      sleep(car.time_arrive)
-      bridge.lane.append(car)
-      bridge.cars_enter += 1
-
-      print(f'Car {car.number} enter bridge on #{car.direction} with {car.time_arrive} seconds to arrive')
-      condition.notify_all()
-      condition.release()
+      bridge.car_pass_in(condition, car)
 
 def print_results(condition, bridge):
   global cars_left
