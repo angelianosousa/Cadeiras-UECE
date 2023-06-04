@@ -1,14 +1,10 @@
 from models.cars import Cars, cars_statistics
 from models.bridges import bridges_statistics
 
-car_counter = 1
-
 def enter_bridge(condition, bridge, change_direction_with_five_cars = False):
-  global car_counter  
     
   while bridge.let_cars_enter():
-    car = Cars(car_counter)
-    car_counter += 1
+    car = Cars()
 
     with condition:
       condition.acquire()
@@ -16,7 +12,6 @@ def enter_bridge(condition, bridge, change_direction_with_five_cars = False):
       # Check if pass five cars     
       if change_direction_with_five_cars == True:
         bridge.mecanism_for_five_cars(car)
-        car_counter += 1 # Increment car number to continue correct counting
 
       # Check if the cars are in opposite sides
       bridge.check_opposite_cars(condition, car)

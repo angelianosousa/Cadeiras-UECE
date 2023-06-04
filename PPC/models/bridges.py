@@ -32,10 +32,10 @@ class Bridges:
 
   def car_pass_in(self, car):
     sleep(car.time_arrive)
-    car.time_start_wait = time()
     sleep(1) # Time space between cars
     self.lane.append(car)
     self.cars_enter += 1
+    car.time_start_wait = time()
 
     print(f'Car {car.number} enter bridge on #{car.direction} with {car.time_arrive} seconds to arrive')
   
@@ -45,7 +45,7 @@ class Bridges:
     self.count_cars() # Just count cars
 
     sleep(TIME_PASS)
-    self.lane.pop(0)
+    self.lane.pop(0)              # Take of a car
     self.cars_out += 1            # Count cars out
     car.time_leave_wait = time()  # Count time leave the bridge
     car.count_time_metrics()      # Build statistics
@@ -58,9 +58,8 @@ class Bridges:
       print(f'Car {car.number} #{car.direction} was stopped...')
       print('Change the direction of the bridge...')
       sleep(2) # Time to change the bridge direction
-      new_car_direction = 'right' if car.direction == 'left' else 'left'
 
-      new_car = Cars(new_car_direction, car.number+1)
+      new_car = Cars()
       print(f'Car {new_car.number} is the next...')
       sleep(1)
       self.car_pass_in(new_car)
