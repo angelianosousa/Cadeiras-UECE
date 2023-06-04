@@ -2,8 +2,7 @@ from time import time, sleep
 from .cars import Cars
 
 # Const variables
-N_CARS    = 100 # Cars numbers
-TIME_PASS = 5   # Time for a car pass thought bridge
+N_CARS = 100 # Cars counter
 
 # Count variables
 cars_right  = 0
@@ -44,7 +43,7 @@ class Bridges:
 
     self.count_cars() # Just count cars
 
-    sleep(TIME_PASS)
+    sleep(car.time_pass)
     self.lane.pop(0)              # Take of a car
     self.cars_out += 1            # Count cars out
     car.time_leave_wait = time()  # Count time leave the bridge
@@ -70,6 +69,6 @@ class Bridges:
   def let_cars_leave(self):
     return self.cars_out < N_CARS
 
-def bridges_statistics():
+def bridge_statistics():
   print(f'Nº Cars right: {cars_right}')
   print(f'Nº Cars left: {cars_left}')
