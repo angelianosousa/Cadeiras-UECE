@@ -9,8 +9,9 @@ if __name__ == '__main__':
   condition = Condition() # Lock variable
 
   cs1 = Thread(name='Leave bridge', target=leave_bridge, args=(condition, bridge))  # Start process to leave the bridge
-  pr1 = Thread(name='will enter bridge', target=enter_bridge, args=(condition, bridge))  # Start process to enter the bridge
-  pr2 = Thread(name='will enter bridge', target=enter_bridge, args=(condition, bridge))  # Start process to enter the bridge
+  pr1 = Thread(name='Will enter bridge 01', target=enter_bridge, args=(condition, bridge))  # Start process to enter the bridge
+  pr2 = Thread(name='Will enter bridge 02', target=enter_bridge, args=(condition, bridge))  # Start process to enter the bridge
+  pr3 = Thread(name='Will enter bridge 03', target=enter_bridge, args=(condition, bridge))  # Start process to enter the bridge
   shr = Thread(name='Show results', target=print_results, args=(condition, bridge))
 
   cs1.start()
@@ -22,6 +23,10 @@ if __name__ == '__main__':
 
   pr2.start()
   pr2.join()
+  sleep(2)
+
+  pr3.start()
+  pr3.join()
   sleep(2)
   cs1.join()
 

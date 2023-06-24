@@ -1,5 +1,6 @@
 from models.cars import Cars, vehicle_statistics
 from models.bridges import bridge_statistics
+from time import time
 
 # def starting_vehicle(create_truck):
 #   if create_truck == True:
@@ -15,12 +16,16 @@ def enter_bridge(condition, bridge, bridge_mecanims = False):
     with condition:
       condition.acquire()
 
+      # Time to wait start before the car enter in the bridge
+      vehicle.time_start_wait = time()
+
       # Check if pass five cars     
       if bridge_mecanims == True:
         bridge.mecanism_for_five_cars(vehicle)
 
       # Check if the cars are in opposite sides
       bridge.check_opposite_cars(condition, vehicle)
+      vehicle.time_leave_wait = time()
 
       bridge.car_pass_in(vehicle)
       condition.notify_all()
