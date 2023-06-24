@@ -2,7 +2,7 @@ from time import time, sleep
 from .cars import Cars
 
 # Const variables
-N_CARS = 10 # Cars counter
+N_CARS = 5 # Cars counter
 
 # Count variables
 cars_right  = 0
@@ -37,7 +37,7 @@ class Bridges:
     self.cars_enter += 1
     car.time_in_bridge = time()
 
-    print(f'Car {car.number} enter bridge on #{car.direction} with {car.time_arrive} seconds to arrive')
+    print(f'Car {car.number} enter bridge on #{car.direction} -> {car.time_arrive} seconds to arrive')
   
   def car_pass_out(self):
     car = self.lane[0]

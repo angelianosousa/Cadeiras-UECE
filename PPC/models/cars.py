@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, choice
 import csv
 import numpy as np
 
@@ -6,13 +6,12 @@ import numpy as np
 car_times            = []
 total_time_in_bridge = 0
 car_counter          = 1
-time_cars_dict       = {}
 
 directions = ['left', 'right']
 
 class Vehicles:
   def __init__(self):
-    self.direction       = directions[car_counter%2]
+    self.direction       = choice(directions)#directions[car_counter%2]
     self.number          = car_counter
     self.time_arrive     = randint(1, 3) # Time to car has comming
     self.time_start_wait = 0
@@ -40,18 +39,13 @@ class Vehicles:
 
     car_times.append(self.__time__())
     self.__total_time_in_bridge__()
-    time_cars_dict[self.number] = self.__time__()
-    write_car_statistics_csv('../cars_times_wait.csv', time_cars_dict)
-
 
 class Cars(Vehicles):
   pass
 
-def filter_array(arr):
-  arr.sort() # Sorting array
-
+def filter_array(times):
   # using numpy to filter the zeros
-  new_arr = np.array(arr)
+  new_arr = np.array(times, dtype=int)
   filter_arr = new_arr > 0
 
   return new_arr[filter_arr]
@@ -59,6 +53,7 @@ def filter_array(arr):
 def vehicle_statistics():
 
   filtered_car_times = filter_array(car_times)
+  filtered_car_times.sort()
 
   time_statistics = {
     'max_time_wait': filtered_car_times[-1],
@@ -72,23 +67,25 @@ def vehicle_statistics():
   print(f'Med time wait: {time_statistics["med_time_wait"]} seconds')
   print(f'Time total in bridge: {time_statistics["total_time_in_bridge"]} seconds')
 
-  write_bridge_statistics_csv('../cars_times_wait.csv', time_statistics)
+  write_car_statistics_csv('./PPC/cars_times_wait.csv', car_times)
+  write_bridge_statistics_csv('./PPC/cars_times_wait.csv', time_statistics)
 
 # For write our csv with times of execution for every counting
 def write_car_statistics_csv(filename, infos):
   with open(filename, 'w', newline='') as csvfile:
     fieldnames = ['Car Nº', 'Time wait']
     writer     = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
     writer.writeheader()
-    for data in infos:
-      writer.writerow({'Car Nº': data, 'Time wait': infos[data]})
+    for index in range(len(infos)):
+      writer.writerow({
+        'Car Nº': index,
+        'Time wait': infos[index]
+      })
 
 def write_bridge_statistics_csv(filename, infos):
   with open(filename, 'a', newline='') as csvfile:
-    fieldnames = ['Max time', 'Min time', 'Med time', 'Total time in bridge']
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
+    fieldnames = ['x', 'Max time', 'Min time', 'Med time', 'Total time in bridge']
+    writer     = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
     writer.writerow({
       'Max time': infos['max_time_wait'], 

@@ -1,6 +1,7 @@
 from models.cars import Cars, vehicle_statistics
 from models.bridges import bridge_statistics
 from time import time
+from threading import current_thread
 
 # def starting_vehicle(create_truck):
 #   if create_truck == True:
