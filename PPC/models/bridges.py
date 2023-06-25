@@ -1,76 +1,109 @@
 from time import time, sleep
-from .cars import Cars
+from models.vehicles import Cars
 
 # Const variables
-N_CARS = 5 # Cars counter
+N_CARS   = 50 # Cars counter
+M_TRUCKS = N_CARS/10 # For each 10 cars we want 1 truck
 
 # Count variables
-cars_right  = 0
-cars_left   = 0
+cars_right   = 0
+cars_left    = 0
+trucks_right = 0
+trucks_left  = 0
 
 class Bridges:
   def __init__(self):
-    self.lane       = []
-    self.cars_enter = 0
-    self.cars_out   = 0
+    self.lane           = []
+    self.vehicles_enter = 0
+    self.vehicles_out   = 0
 
-  def count_cars(self):
+  def __current_vehicle__(self):
+    if len(self.lane) == 0:
+      return 'Bridge empty'
+
+    return self.lane[0]
+  
+  def __last_vehicle__(self):
+    if len(self.lane) == 0:
+      return 'Bridge empty'
+
+    return self.lane[-1]
+  
+  def __has_vehicle__(self):
+    return len(self.lane) > 0
+  
+  # def vehicles_count(self):
+  #   return { 'cars': cars_right + cars_left, 'trucks': trucks_right + trucks_left}
+
+  def count_vehicles_sides(self):
     global cars_left
     global cars_right
+    global trucks_right
+    global trucks_left
 
-    if self.lane[0].direction == 'left':
-      cars_left += 1
+    vehicle = self.__current_vehicle__()
+
+    if vehicle.__type_vehicle__() == 'Car':
+      if vehicle.direction == 'left':
+        cars_left += 1
+      else:
+        cars_right += 1
     else:
-      cars_right += 1
+      if vehicle.direction == 'left':
+        trucks_right += 1
+      else:
+        trucks_left += 1
   
-  def check_opposite_cars(self, condition, current_car):
-    if len(self.lane) > 0 and self.lane[-1].direction != current_car.direction:
-      print(f'Car {current_car.number} and {self.lane[-1].number} has opposite sides...')
-      print(f'Car {current_car.number} have to wait...')
+  def check_opposite_cars(self, condition, current_vehicle):
+    if len(self.lane) > 0 and self.__last_vehicle__().direction != current_vehicle.direction:
+      print(f'{current_vehicle.__type_vehicle__()} {current_vehicle.number} and {self.__last_vehicle__().__type_vehicle__()} {self.__last_vehicle__().number} has opposite sides...')
+      print(f'{current_vehicle.__type_vehicle__()} {current_vehicle.number} have to wait...')
       condition.wait()
-
-  def car_pass_in(self, car):
-    sleep(car.time_arrive)
-    sleep(1)                                         # Time space between cars
-
-    self.lane.append(car)
-    self.cars_enter += 1
-    car.time_in_bridge = time()
-
-    print(f'Car {car.number} enter bridge on #{car.direction} -> {car.time_arrive} seconds to arrive')
-  
-  def car_pass_out(self):
-    car = self.lane[0]
-
-    self.count_cars()                                # Just count cars
-
-    sleep(car.time_pass)
-    self.lane.pop(0)                                 # Take of a car
-    self.cars_out += 1                               # Count cars out
-
-    car.time_in_bridge = time() - car.time_in_bridge # Time total in bridge
-    car.count_time_metrics()                         # Build statistics
-
-    print(f'Car {car.number} leave bridge on #{car.direction} -> time wait: {round(car.__time__(), 2)} seconds')
   
   def mecanism_for_five_cars(self, car):
-    if self.cars_enter > 0 and self.cars_enter % 5 == 0:
+    if self.vehicles_enter > 0 and self.vehicles_enter % 5 == 0:
       print('Five cars was enter..')
-      print(f'Car {car.number} #{car.direction} was stopped...')
+      print(f'{car.__type_vehicle__()} {car.number} #{car.direction} was stopped...')
       print('Change the direction of the bridge...')
       sleep(1)                                        # Time to change the bridge direction
 
       new_car = Cars()
       print(f'Car {new_car.number} is the next...')
       sleep(1)
-      self.car_pass_in(new_car)
+      self.vehicle_pass_in(new_car)
+
+  def vehicle_pass_in(self, vehicle):
+    sleep(vehicle.time_arrive)
+    sleep(1)                                         # Time space between cars
+
+    self.lane.append(vehicle)
+    self.vehicles_enter += 1
+    vehicle.time_in_bridge  = time()
+
+    print(f'{vehicle.__type_vehicle__()} {vehicle.number} enter bridge on #{vehicle.direction} -> {vehicle.time_arrive} seconds to arrive')
   
-  def let_cars_enter(self):
-    return self.cars_enter < N_CARS
+  def vehicle_pass_out(self):
+    vehicle = self.lane[0]
+
+    self.count_vehicles_sides()                          # Just count cars
+
+    sleep(vehicle.time_pass)
+    self.lane.pop(0)                                 # Take of a vehicle
+    self.vehicles_out += 1                           # Count cars out
+
+    vehicle.time_in_bridge = time() - vehicle.time_in_bridge # Time total in bridge
+    vehicle.count_time_metrics()                         # Build statistics
+
+    print(f'{vehicle.__type_vehicle__()} {vehicle.number} leave bridge on #{vehicle.direction} -> time wait: {round(vehicle.__time__(), 2)} seconds')
+
+  def let_vehicles_enter(self):
+    return self.vehicles_enter < N_CARS + M_TRUCKS
   
-  def let_cars_leave(self):
-    return self.cars_out < N_CARS
+  def let_vehicles_leave(self):
+    return self.vehicles_out < N_CARS + M_TRUCKS
 
 def bridge_statistics():
   print(f'Nº Cars right: {cars_right}')
   print(f'Nº Cars left: {cars_left}')
+  print(f'Nº Trucks left: {trucks_right}')
+  print(f'Nº Trucks left: {trucks_left}')

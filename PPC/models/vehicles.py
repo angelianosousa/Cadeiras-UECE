@@ -5,24 +5,28 @@ import numpy as np
 # Time variables
 car_times            = []
 total_time_in_bridge = 0
-car_counter          = 1
+vehicle_counter      = 1
+truck_counter        = 101
 
 directions = ['left', 'right']
 
 class Vehicles:
   def __init__(self):
-    self.direction       = choice(directions)#directions[car_counter%2]
-    self.number          = car_counter
+    self.direction       = choice(directions)
+    self.number          = vehicle_counter
     self.time_arrive     = randint(1, 3) # Time to car has comming
     self.time_start_wait = 0
     self.time_leave_wait = 0
     self.time_in_bridge  = 0
-    self.time_pass       = 5             # Time for a car pass thought bridge
+    self.time_pass       = 2             # Time for a car pass thought bridge
     self.__increment_vehicle_counter__() # Increment car number to continue correct counting
   
+  def __type_vehicle__(self):
+    return 'Car'
+  
   def __increment_vehicle_counter__(self):
-    global car_counter
-    car_counter += 1
+    global vehicle_counter
+    vehicle_counter += 1
   
   def __time__(self):
     return round(self.time_leave_wait - self.time_start_wait, 2)
@@ -42,6 +46,24 @@ class Vehicles:
 
 class Cars(Vehicles):
   pass
+
+class Trucks(Vehicles):
+  def __init__(self):
+    self.direction       = choice(directions)
+    self.number          = truck_counter
+    self.time_arrive     = randint(1, 3) # Time to car has comming
+    self.time_start_wait = 0
+    self.time_leave_wait = 0
+    self.time_in_bridge  = 0
+    self.time_pass       = 5            # Time for a car pass thought bridge
+    self.__increment_vehicle_counter__() # Increment car number to continue correct counting
+  
+  def __type_vehicle__(self):
+    return 'Truck'
+  
+  def __increment_vehicle_counter__(self):
+    global truck_counter
+    truck_counter += 1
 
 def filter_array(times):
   # using numpy to filter the zeros
