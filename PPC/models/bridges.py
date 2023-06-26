@@ -2,7 +2,7 @@ from time import time, sleep
 from models.vehicles import Cars
 
 # Const variables
-N_CARS   = 10 # Cars counter
+N_CARS   = 100 # Cars counter
 M_TRUCKS = N_CARS/10 # For each 10 cars we want 1 truck
 
 # Count variables
