@@ -7,10 +7,11 @@ if __name__ == '__main__':
 
   bridge    = Bridges()
   condition = Condition() # Lock variable
+  BRIDGE_MECANISM = True
 
   cs1 = Thread(name='Leave bridge', target=leave_bridge, args=(condition, bridge))  # Start process to leave the bridge
-  pr1 = Thread(name='will enter bridge', target=enter_bridge, args=(condition, bridge, True))  # Start process to enter the bridge
-  pr2 = Thread(name='will enter bridge', target=enter_bridge, args=(condition, bridge, True))  # Start process to enter the bridge
+  pr1 = Thread(name='will enter bridge', target=enter_bridge, args=(condition, bridge, BRIDGE_MECANISM))  # Start process to enter the bridge
+  pr2 = Thread(name='will enter bridge', target=enter_bridge, args=(condition, bridge, BRIDGE_MECANISM))  # Start process to enter the bridge
   shr = Thread(name='Show results', target=print_results, args=(condition, bridge))
 
   cs1.start()

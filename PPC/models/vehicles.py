@@ -4,31 +4,32 @@ import numpy as np
 
 # Time variables
 car_times            = []
+total_time_wait      = 0
 total_time_in_bridge = 0
 vehicle_counter      = 1
-truck_counter        = 101
+truck_counter        = 1
 
 directions = ['left', 'right']
 
 class Vehicles:
-  def __init__(self):
-    self.direction       = choice(directions)
+  def __init__(self, direction=directions[vehicle_counter%2]):
+    self.direction       = direction
     self.number          = vehicle_counter
     self.time_arrive     = randint(1, 3) # Time to car has comming
     self.time_start_wait = 0
     self.time_leave_wait = 0
     self.time_in_bridge  = 0
-    self.time_pass       = 2             # Time for a car pass thought bridge
+    self.time_pass       = 5             # Time for a car pass thought bridge
     self.__increment_vehicle_counter__() # Increment car number to continue correct counting
   
-  def __type_vehicle__(self):
+  def __type__(self):
     return 'Car'
   
   def __increment_vehicle_counter__(self):
     global vehicle_counter
     vehicle_counter += 1
   
-  def __time__(self):
+  def __time_wait__(self):
     return round(self.time_leave_wait - self.time_start_wait, 2)
 
   def __total_time_in_bridge__(self):
@@ -37,11 +38,13 @@ class Vehicles:
     total_time_in_bridge += self.__get_time_in_bridge__()
 
   def __get_time_in_bridge__(self):
-    return self.time_in_bridge
+    return round(self.time_in_bridge, 2)
 
   def count_time_metrics(self):
+    global total_time_wait
 
-    car_times.append(self.__time__())
+    car_times.append(self.__time_wait__())
+    total_time_wait += self.__time_wait__()
     self.__total_time_in_bridge__()
 
 class Cars(Vehicles):
@@ -49,16 +52,16 @@ class Cars(Vehicles):
 
 class Trucks(Vehicles):
   def __init__(self):
-    self.direction       = choice(directions)
+    self.direction       = directions[truck_counter%2]
     self.number          = truck_counter
     self.time_arrive     = randint(1, 3) # Time to car has comming
     self.time_start_wait = 0
     self.time_leave_wait = 0
     self.time_in_bridge  = 0
-    self.time_pass       = 5            # Time for a car pass thought bridge
+    self.time_pass       = 10            # Time for a car pass thought bridge
     self.__increment_vehicle_counter__() # Increment car number to continue correct counting
   
-  def __type_vehicle__(self):
+  def __type__(self):
     return 'Truck'
   
   def __increment_vehicle_counter__(self):
@@ -74,14 +77,15 @@ def filter_array(times):
 
 def vehicle_statistics():
 
+  print(car_times)
   filtered_car_times = filter_array(car_times)
   filtered_car_times.sort()
 
   time_statistics = {
     'max_time_wait': filtered_car_times[-1],
     'min_time_wait': filtered_car_times[0],
-    'med_time_wait': round(total_time_in_bridge/len(filtered_car_times), 2),
-    'total_time_in_bridge': round(total_time_in_bridge, 2)
+    'med_time_wait': round(total_time_wait/len(car_times), 2),
+    'total_time_in_bridge': round(total_time_wait, 2)
   }
   
   print(f'Max time wait: {time_statistics["max_time_wait"]} seconds')
@@ -106,7 +110,7 @@ def write_car_statistics_csv(filename, infos):
 
 def write_bridge_statistics_csv(filename, infos):
   with open(filename, 'a', newline='') as csvfile:
-    fieldnames = ['x', 'Max time', 'Min time', 'Med time', 'Total time in bridge']
+    fieldnames = ['Max time', 'Min time', 'Med time', 'Total time in bridge']
     writer     = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
     writer.writerow({
@@ -115,4 +119,3 @@ def write_bridge_statistics_csv(filename, infos):
       'Med time': infos['med_time_wait'],
       'Total time in bridge': infos['total_time_in_bridge']
     })
-

@@ -1,5 +1,5 @@
-from models.vehicles import *#Cars, Trucks, vehicle_statistics
-from models.bridges import *#bridge_statistics
+from models.vehicles import *
+from models.bridges import bridge_statistics
 from time import time
 
 def creating_vehicles(bridge, create_truck=False):
@@ -10,7 +10,7 @@ def creating_vehicles(bridge, create_truck=False):
 
 def enter_bridge(condition, bridge, bridge_mecanims=False, create_truck=False):
 
-  while bridge.let_vehicles_enter():
+  while bridge.let_vehicles_enter(create_truck):
 
     vehicle = creating_vehicles(bridge, create_truck)
 
@@ -25,30 +25,26 @@ def enter_bridge(condition, bridge, bridge_mecanims=False, create_truck=False):
       if bridge_mecanims == True:
         bridge.mecanism_for_five_cars(vehicle)
 
+      # else:
+
       # Trucks check if bridge has cars
-      if vehicle.__type_vehicle__() == 'Truck' and bridge.__has_vehicle__():
-        print(f"Stopping Truck {vehicle.number}, bridge has cars, he'll wait...")
-        condition.wait()
+      bridge.trucks_check_cars(condition, vehicle)
 
       # Car check if there's a truck in the bridge
-      if bridge.__has_vehicle__():
-        if vehicle.__type_vehicle__() == 'Car' and bridge.__last_vehicle__().__type_vehicle__() == 'Truck':
-          print(f'Only Truck {bridge.__last_vehicle__().number} can pass now...')
-          condition.wait()
-          print('Trucks pass, bridge free...')
-
+      bridge.cars_check_trucks(condition, vehicle)
+      
       # Check if the cars are in opposite sides
       bridge.check_opposite_cars(condition, vehicle)
 
       bridge.vehicle_pass_in(vehicle)
-      vehicle.time_leave_wait = time()
 
+      vehicle.time_leave_wait = time()
       condition.notify_all()
       condition.release()
 
-def leave_bridge(condition, bridge):
+def leave_bridge(condition, bridge, create_truck=False):
 
-  while bridge.let_vehicles_leave():
+  while bridge.let_vehicles_leave(create_truck):
 
     with condition:
       condition.acquire()
