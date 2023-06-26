@@ -3,14 +3,14 @@ from models.bridges import bridge_statistics
 from time import time
 
 def creating_vehicles(bridge, create_truck=False):
-  if create_truck == True and bridge.vehicles_enter % 10 == 0 and bridge.vehicles_enter > 1:
+  if create_truck == True and (bridge.vehicles_enter % 10 == 0 and bridge.vehicles_enter > 1):
     return Trucks()
   else:
     return Cars()
 
 def enter_bridge(condition, bridge, bridge_mecanims=False, create_truck=False):
 
-  while bridge.let_vehicles_enter(create_truck):
+  while bridge.let_vehicles_enter():
 
     vehicle = creating_vehicles(bridge, create_truck)
 
@@ -20,15 +20,8 @@ def enter_bridge(condition, bridge, bridge_mecanims=False, create_truck=False):
       # Time to wait start before the car enter in the bridge
       vehicle.time_start_wait = time()
 
-      # Check if pass five cars
-      # Check if a truck pass
-      if bridge_mecanims == True:
-        bridge.mecanism_for_five_cars(vehicle)
-
-      # else:
-
       # Trucks check if bridge has cars
-      bridge.trucks_check_cars(condition, vehicle)
+      bridge.truck_check_cars(condition, vehicle)
 
       # Car check if there's a truck in the bridge
       bridge.cars_check_trucks(condition, vehicle)
@@ -36,15 +29,24 @@ def enter_bridge(condition, bridge, bridge_mecanims=False, create_truck=False):
       # Check if the cars are in opposite sides
       bridge.check_opposite_cars(condition, vehicle)
 
+      # Check if pass five cars
+      # Check if a truck pass
+      if bridge_mecanims == True:
+        bridge.mecanism_for_five_cars(vehicle)
+
+      # if vehicle.__type__() == 'Truck':
+      #   bridge.vehicle_pass_in(vehicle)
+      #   condition.wait()
+      # else:
       bridge.vehicle_pass_in(vehicle)
 
       vehicle.time_leave_wait = time()
       condition.notify_all()
       condition.release()
 
-def leave_bridge(condition, bridge, create_truck=False):
+def leave_bridge(condition, bridge):
 
-  while bridge.let_vehicles_leave(create_truck):
+  while bridge.let_vehicles_leave():
 
     with condition:
       condition.acquire()

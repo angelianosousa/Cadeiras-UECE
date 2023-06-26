@@ -10,7 +10,7 @@ if __name__ == '__main__':
   HAVE_TRUCKS     = True
   BRIDGE_MECANISM = True
 
-  cs1 = Thread(name='Leave bridge',      target=leave_bridge,  args=(condition, bridge, HAVE_TRUCKS))  # Start process to leave the bridge
+  cs1 = Thread(name='Leave bridge',      target=leave_bridge,  args=(condition, bridge))  # Start process to leave the bridge
   pr1 = Thread(name='Will enter bridge', target=enter_bridge,  args=(condition, bridge, BRIDGE_MECANISM, HAVE_TRUCKS))  # Start process to enter the bridge
   pr2 = Thread(name='Will enter bridge', target=enter_bridge,  args=(condition, bridge, BRIDGE_MECANISM, HAVE_TRUCKS))  # Start process to enter the bridge
   shr = Thread(name='Show results',      target=print_results, args=(condition, bridge))

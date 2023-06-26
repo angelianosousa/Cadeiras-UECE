@@ -12,8 +12,8 @@ truck_counter        = 1
 directions = ['left', 'right']
 
 class Vehicles:
-  def __init__(self, direction=directions[vehicle_counter%2]):
-    self.direction       = direction
+  def __init__(self, direction=''):
+    self.direction       = direction if direction != '' else directions[vehicle_counter%2]
     self.number          = vehicle_counter
     self.time_arrive     = randint(1, 3) # Time to car has comming
     self.time_start_wait = 0
@@ -77,7 +77,6 @@ def filter_array(times):
 
 def vehicle_statistics():
 
-  print(car_times)
   filtered_car_times = filter_array(car_times)
   filtered_car_times.sort()
 

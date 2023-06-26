@@ -16,7 +16,7 @@ class Bridges:
     self.lane           = []
     self.vehicles_enter = 0
     self.vehicles_out   = 0
-    self.cars_stopped    = []
+    # self.vehicles_stopped    = []
 
   def __current_vehicle__(self):
     if len(self.lane) == 0:
@@ -60,7 +60,7 @@ class Bridges:
       condition.wait()
   
   def mecanism_for_five_cars(self, car):
-    if (self.vehicles_enter > 0 and self.vehicles_enter % 5 == 0) or car.__type__() == 'Truck':
+    if (self.vehicles_enter > 0 and self.vehicles_enter % 5 == 0) and car.__type__() == 'Car':
       print('Five cars was enter..')
       print(f'{car.__type__()} {car.number} #{car.direction} was stopped...')
       print('Change the direction of the bridge...')
@@ -71,19 +71,22 @@ class Bridges:
       
       print(f'{new_car.__type__()} {new_car.number} enter bridge on #{new_car.direction} -> {new_car.time_arrive} seconds to arrive')
       sleep(1)
-      self.cars_stopped.append(new_car)
+      # self.vehicles_stopped.append(new_car)
+      # self.lane.insert(0, new_car)
+      self.lane.insert(0, new_car)
+      self.vehicles_enter += 1
     
-  def trucks_check_cars(self, condition, current_vehicle):
-    if current_vehicle.__type__() == 'Truck' and self.__has_vehicle__():
-        print(f"Stopping Truck {current_vehicle.number}, bridge has cars, he'll wait...")
-        condition.wait()
+  def truck_check_cars(self, condition, next_vehicle):
+    if next_vehicle.__type__() == 'Truck' and self.__has_vehicle__():
+      print(f"Stopping Truck {next_vehicle.number}, bridge has cars, he'll wait...")
+      condition.wait()
   
-  def cars_check_trucks(self, condition, current_vehicle):
+  def cars_check_trucks(self, condition, next_vehicle):
     if self.__has_vehicle__():
-        if current_vehicle.__type__() == 'Car' and self.__last_vehicle__().__type__() == 'Truck':
-          print(f'Only Truck {self.__last_vehicle__().number} can pass now...')
-          condition.wait()
-          print('Trucks pass, bridge free...')
+      if next_vehicle.__type__() == 'Car' and self.__last_vehicle__().__type__() == 'Truck':
+        print(f'Only Truck {self.__last_vehicle__().number} can pass now...')
+        condition.wait()
+        print('Trucks pass, bridge free...')
 
   def vehicle_pass_in(self, vehicle):
     sleep(vehicle.time_arrive)
@@ -91,39 +94,35 @@ class Bridges:
 
     self.lane.append(vehicle)
     self.vehicles_enter += 1
+
     vehicle.time_in_bridge = time()
 
     print(f'{vehicle.__type__()} {vehicle.number} enter bridge on #{vehicle.direction} -> {vehicle.time_arrive} seconds to arrive')
   
   def vehicle_pass_out(self):
 
-    if len(self.cars_stopped) > 0:
-      vehicle = self.cars_stopped.pop(0)
-    else:
-      vehicle = self.lane[0]
+    # if len(self.vehicles_stopped) > 0:
+    #   vehicle = self.vehicles_stopped.pop(0)
+    # else:
+    vehicle = self.lane[0]
 
     self.count_vehicles_sides()                      # Just count cars
 
     sleep(vehicle.time_pass)
     self.lane.pop(0)                                 # Take of a vehicle
-    self.vehicles_out += 1                           # Count cars out
+
+    self.vehicles_out += 1
 
     vehicle.time_in_bridge = time() - vehicle.time_in_bridge # Time total in bridge
-    vehicle.count_time_metrics()                         # Build statistics
+    vehicle.count_time_metrics()                             # Build statistics
 
     print(f'{vehicle.__type__()} {vehicle.number} leave bridge on #{vehicle.direction} -> time wait: {round(vehicle.__time_wait__(), 2)} seconds')
 
-  def let_vehicles_enter(self, have_truck=False):
-    if have_truck == True:
-      return self.vehicles_enter < N_CARS + M_TRUCKS
-    else:
-      return self.vehicles_enter < N_CARS
+  def let_vehicles_enter(self):
+    return self.vehicles_enter <= M_TRUCKS + N_CARS
   
-  def let_vehicles_leave(self, have_truck=False):
-    if have_truck == True:
-      return self.vehicles_out < N_CARS + M_TRUCKS
-    else:
-      return self.vehicles_out < N_CARS
+  def let_vehicles_leave(self):
+    return self.vehicles_out <= M_TRUCKS + N_CARS
 
 def bridge_statistics():
   print(f'Nº Cars right: {cars_right}')
