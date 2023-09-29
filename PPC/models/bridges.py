@@ -16,7 +16,6 @@ class Bridges:
     self.lane           = []
     self.vehicles_enter = 0
     self.vehicles_out   = 0
-    # self.vehicles_stopped    = []
 
   def __current_vehicle__(self):
     if len(self.lane) == 0:
@@ -71,8 +70,7 @@ class Bridges:
       
       print(f'{new_car.__type__()} {new_car.number} enter bridge on #{new_car.direction} -> {new_car.time_arrive} seconds to arrive')
       sleep(1)
-      # self.vehicles_stopped.append(new_car)
-      # self.lane.insert(0, new_car)
+
       self.lane.insert(0, new_car)
       self.vehicles_enter += 1
     
@@ -101,9 +99,6 @@ class Bridges:
   
   def vehicle_pass_out(self):
 
-    # if len(self.vehicles_stopped) > 0:
-    #   vehicle = self.vehicles_stopped.pop(0)
-    # else:
     vehicle = self.lane[0]
 
     self.count_vehicles_sides()                      # Just count cars

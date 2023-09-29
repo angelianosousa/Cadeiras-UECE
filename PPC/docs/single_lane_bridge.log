@@ -1204,4 +1204,49 @@ exit
 Script done, file is PPC/docs/single_lane_bridge.log
 ]0;angeliano@Lenovo-G50-80: ~/projects/cadeiras[01;32mangeliano@Lenovo-G50-80[00m:[01;34m~/projects/cadeiras[00m$ git add .
 ]0;angeliano@Lenovo-G50-80: ~/projects/cadeiras[01;32mangeliano@Lenovo-G50-80[00m:[01;34m~/projects/cadeiras[00m$ git commi[K[K[K[K[Krestore --staged CG/game.py
-]0;angeliano@Lenovo-G50-80: ~/projects/cadeiras
+]0;angeliano@Lenovo-G50-80: ~/projects/cadeiras[01;32mangeliano@Lenovo-G50-80[00m:[01;34m~/projects/cadeiras[00m$ git status
+On branch feat/PPC
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	[32mmodified:   PPC/__pycache__/single_lane_bridge.cpython-38.pyc[m
+	[32mmodified:   PPC/cars_times_wait.csv[m
+	[32mnew file:   PPC/docs/single_lane_bridge.log[m
+	[32mmodified:   PPC/models/__pycache__/bridges.cpython-38.pyc[m
+	[32mmodified:   PPC/models/__pycache__/vehicles.cpython-38.pyc[m
+	[32mmodified:   PPC/models/bridges.py[m
+	[32mmodified:   PPC/models/vehicles.py[m
+	[32mmodified:   PPC/phase_03.py[m
+	[32mmodified:   PPC/single_lane_bridge.py[m
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	[31mmodified:   PPC/docs/single_lane_bridge.log[m
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	[31mCG/[m
+
+]0;angeliano@Lenovo-G50-80: ~/projects/cadeiras[01;32mangeliano@Lenovo-G50-80[00m:[01;34m~/projects/cadeiras[00m$ git add PPC/docs/single_lane_bridge.log 
+]0;angeliano@Lenovo-G50-80: ~/projects/cadeiras[01;32mangeliano@Lenovo-G50-80[00m:[01;34m~/projects/cadeiras[00m$ gitc[K commit -m 'feat [K: Finalizado a 3 parte do tr[K[K[K[K[K[K[K[K[K[K[Ketapa'
+[feat/PPC 82feeaf] feat: Finalizado a 3 etapa
+ 9 files changed, 1365 insertions(+), 58 deletions(-)
+ rewrite PPC/__pycache__/single_lane_bridge.cpython-38.pyc (69%)
+ rewrite PPC/cars_times_wait.csv (82%)
+ create mode 100644 PPC/docs/single_lane_bridge.log
+ rewrite PPC/models/__pycache__/bridges.cpython-38.pyc (83%)
+ rewrite PPC/models/__pycache__/vehicles.cpython-38.pyc (84%)
+]0;angeliano@Lenovo-G50-80: ~/projects/cadeiras[01;32mangeliano@Lenovo-G50-80[00m:[01;34m~/projects/cadeiras[00m$ git push origin feat/PPC 
+Enumerating objects: 28, done.
+Counting objects:   3% (1/28)Counting objects:   7% (2/28)Counting objects:  10% (3/28)Counting objects:  14% (4/28)Counting objects:  17% (5/28)Counting objects:  21% (6/28)Counting objects:  25% (7/28)Counting objects:  28% (8/28)Counting objects:  32% (9/28)Counting objects:  35% (10/28)Counting objects:  39% (11/28)Counting objects:  42% (12/28)Counting objects:  46% (13/28)Counting objects:  50% (14/28)Counting objects:  53% (15/28)Counting objects:  57% (16/28)Counting objects:  60% (17/28)Counting objects:  64% (18/28)Counting objects:  67% (19/28)Counting objects:  71% (20/28)Counting objects:  75% (21/28)Counting objects:  78% (22/28)Counting objects:  82% (23/28)Counting objects:  85% (24/28)Counting objects:  89% (25/28)Counting objects:  92% (26/28)Counting objects:  96% (27/28)Counting objects: 100% (28/28)Counting objects: 100% (28/28), done.
+Delta compression using up to 4 threads
+Compressing objects:   6% (1/16)Compressing objects:  12% (2/16)Compressing objects:  18% (3/16)Compressing objects:  25% (4/16)Compressing objects:  31% (5/16)Compressing objects:  37% (6/16)Compressing objects:  43% (7/16)Compressing objects:  50% (8/16)Compressing objects:  56% (9/16)Compressing objects:  62% (10/16)Compressing objects:  68% (11/16)Compressing objects:  75% (12/16)Compressing objects:  81% (13/16)Compressing objects:  87% (14/16)Compressing objects:  93% (15/16)Compressing objects: 100% (16/16)Compressing objects: 100% (16/16), done.
+Writing objects:   6% (1/16)Writing objects:  12% (2/16)Writing objects:  18% (3/16)Writing objects:  25% (4/16)Writing objects:  31% (5/16)Writing objects:  37% (6/16)Writing objects:  43% (7/16)Writing objects:  50% (8/16)Writing objects:  56% (9/16)Writing objects:  62% (10/16)Writing objects:  68% (11/16)Writing objects:  75% (12/16)Writing objects:  81% (13/16)Writing objects:  87% (14/16)Writing objects:  93% (15/16)Writing objects: 100% (16/16)Writing objects: 100% (16/16), 11.21 KiB | 1.60 MiB/s, done.
+Total 16 (delta 5), reused 0 (delta 0)
+remote: Resolving deltas:   0% (0/5)[Kremote: Resolving deltas:  20% (1/5)[Kremote: Resolving deltas:  40% (2/5)[Kremote: Resolving deltas:  60% (3/5)[Kremote: Resolving deltas:  80% (4/5)[Kremote: Resolving deltas: 100% (5/5)[Kremote: Resolving deltas: 100% (5/5), completed with 5 local objects.[K
+To github.com:angelianosousa/Cadeiras-UECE.git
+   9790644..82feeaf  feat/PPC -> feat/PPC
+]0;angeliano@Lenovo-G50-80: ~/projects/cadeiras[01;32mangeliano@Lenovo-G50-80[00m:[01;34m~/projects/cadeiras[00m$ [K]0;angeliano@Lenovo-G50-80: ~/projects/cadeiras[01;32mangeliano@Lenovo-G50-80[00m:[01;34m~/projects/cadeiras[00m$ (arg: 1) [K]0;angeliano@Lenovo-G50-80: ~/projects/cadeiras[01;32mangeliano@Lenovo-G50-80[00m:[01;34m~/projects/cadeiras[00m$ exit
+exit
+
+Script done on 2023-06-26 17:49:51-03:00 [COMMAND_EXIT_CODE="0"]

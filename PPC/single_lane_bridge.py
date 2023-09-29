@@ -34,10 +34,6 @@ def enter_bridge(condition, bridge, bridge_mecanims=False, create_truck=False):
       if bridge_mecanims == True:
         bridge.mecanism_for_five_cars(vehicle)
 
-      # if vehicle.__type__() == 'Truck':
-      #   bridge.vehicle_pass_in(vehicle)
-      #   condition.wait()
-      # else:
       bridge.vehicle_pass_in(vehicle)
 
       vehicle.time_leave_wait = time()
