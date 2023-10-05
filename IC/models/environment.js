@@ -13,7 +13,13 @@ module.exports = class Environment {
     this.robot_position_line   = robot_position_line;
     this.robot                 = robot;
     this.fill_spaces()
-  }  
+    this.resize_matrix()
+  }
+
+  // To make matrix quadratic - In test
+  resize_matrix(){
+    this.spaces.resize([this.quantity_spaces, this.quantity_spaces])
+  }
 
   fill_spaces(){
     for (let i = 0; i < this.quantity_spaces; i++){
@@ -25,7 +31,7 @@ module.exports = class Environment {
 
   show_spaces(){
     this.spaces.forEach(function (space, index) {
-      console.log('state room:', space.state_room, 'position:', index);
+      console.log('Room:', space.state_room, 'Position:', index);
     });
   }
 
