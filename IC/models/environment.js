@@ -13,6 +13,7 @@ module.exports = class Environment {
   ) {
     this.quantity_spaces = quantity_spaces;
     this.spaces = Math.matrix();
+    this.spacesBackup = Math.matrix();
     this.robot_position_column = robot_position_column;
     this.robot_position_line = robot_position_line;
     this.robot = robot;
@@ -22,9 +23,12 @@ module.exports = class Environment {
   fill_spaces() {
     for (let i = 0; i < this.quantity_spaces; i++) {
       for (let j = 0; j < this.quantity_spaces; j++) {
-        this.spaces.set(
+        const random = parseInt(Math.random() * 2);
+        this.spaces.set([i, j], new Room(random, [i, j], this.spaces));
+
+        this.spacesBackup.set(
           [i, j],
-          new Room(parseInt(Math.random() * 2), [i, j], this.spaces)
+          new Room(random, [i, j], this.spacesBackup)
         );
       }
     }
@@ -40,7 +44,15 @@ module.exports = class Environment {
     return this.spaces;
   }
 
+  get_spaces_backup() {
+    return this.spacesBackup;
+  }
+
   get_space(column, line) {
     return this.spaces.get([column, line]);
+  }
+
+  set_spaces(spaces) {
+    this.spaces = spaces;
   }
 };

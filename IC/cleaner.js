@@ -5,10 +5,8 @@ const Robot = require("./models/robot");
 const cleaner = new Robot();
 const environment = new Environment(3, cleaner);
 
-// environment.show_spaces();
-
 spaces = environment.get_spaces();
-cleaner.start_dumb(spaces);
-// cleaner.start_intelligent(spaces);
 
-// environment.show_spaces();
+console.log("STARTING DUMB ROBOT:");
+cleaner.start_dumb(spaces, environment);
+console.log("=========================================");
