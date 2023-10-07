@@ -6,11 +6,10 @@ module.exports = class Robot {
     this.room_states = [];
   }
 
-  start_dumb(spaces) {
+  async start_dumb(spaces) {
     const win_points = () => this.win_points();
     const lose_points = () => this.lose_points();
-
-    let start = true;
+    const get_points = () => this.space_counting;
 
     /**
      * [0,0][0,1][0,2]
@@ -18,42 +17,124 @@ module.exports = class Robot {
      * [2,0][2,1][2,2]
      */
 
+    let start = true;
+    let room_size = 3;
+    let robotPositionX = 0;
+    let robotPositionY = 0;
+
     while (start) {
+      // Check if room was cleaned
       spaces.forEach(function (space) {
-        if (space.is_spaces_clear()) {
+        if (space.is_spaces_clear() && start) {
+          console.log("All Cleaned!!");
+
+          console.log("Total points: ", get_points());
+
           start = false;
         }
       });
 
+      if (!start) break;
+
+      // Await for a second
+      await new Promise((r) => setTimeout(r, 1000));
+
+      // Variables
+      let findOtherRoom = false;
+
       let room = [];
 
-      for (let i = 0; i < 3; i++) {
+      let initialRobotPositionX = robotPositionX;
+      let initialRobotPositionY = robotPositionY;
+
+      // Print room
+      for (let i = 0; i < room_size; i++) {
         room[i] = [];
-        for (let j = 0; j < 3; j++) {
+        for (let j = 0; j < room_size; j++) {
           room[i][j] = spaces.get([i, j]).state_room;
         }
       }
-
       console.log(room);
 
-      const randomX = Math.floor(Math.random() * 3); //multiplica pelo numero da matriz
-      const randomY = Math.floor(Math.random() * 3);
+      const verifyIfRoomIsAble = () => {
+        if (
+          robotPositionX > room_size - 1 ||
+          robotPositionX < 0 ||
+          robotPositionY > room_size - 1 ||
+          robotPositionY < 0
+        ) {
+          return false;
+        }
 
-      const currentRoom = spaces.get([randomX, randomY]);
+        return true;
+      };
 
-      console.log(spaces.get([randomX, randomY]).get_room_position());
+      // Decide how direction to go
+      const randomMovement = Math.floor(Math.random() * 4);
+      switch (randomMovement) {
+        case 0:
+          // Move UP
+          console.log("Moving to UP");
+          robotPositionX--;
 
-      if (currentRoom.is_clean()) {
-        console.log("Space already clean");
-        lose_points();
+          if (!verifyIfRoomIsAble()) findOtherRoom = true;
+          break;
+        case 1:
+          // Move DOWN
+          console.log("Moving to DOWN");
+          robotPositionX++;
+
+          if (!verifyIfRoomIsAble()) findOtherRoom = true;
+          break;
+        case 2:
+          // Move RIGHT
+          console.log("Moving to RIGHT");
+          robotPositionY++;
+
+          if (!verifyIfRoomIsAble()) findOtherRoom = true;
+          break;
+        case 3:
+          // Move LEFT
+          console.log("Moving to LEFT");
+          robotPositionY--;
+
+          if (!verifyIfRoomIsAble()) findOtherRoom = true;
+          break;
+
+        default:
+          // Move UP
+          console.log("Moving to UP");
+          robotPositionX--;
+
+          if (!verifyIfRoomIsAble()) findOtherRoom = true;
+          break;
+      }
+
+      // Cleaner action
+      if (findOtherRoom) {
+        console.log("===========================================");
+        console.log("Wall finded! Calculating other route...");
+        console.log("===========================================");
+
+        robotPositionX = initialRobotPositionX;
+        robotPositionY = initialRobotPositionY;
       } else {
-        console.log("Cleaning...");
-        currentRoom.clean_state();
-        win_points();
+        const currentRoom = spaces.get([robotPositionX, robotPositionY]);
+
+        console.log(
+          spaces.get([robotPositionX, robotPositionY]).get_room_position()
+        );
+
+        if (currentRoom.is_clean()) {
+          console.log("Space already clean");
+          lose_points();
+        } else {
+          console.log("Cleaning...");
+          currentRoom.clean_state();
+          win_points();
+        }
       }
     }
-
-    console.log("Total points: ", this.space_counting);
   }
 
   // start_intelligent(spaces) {
