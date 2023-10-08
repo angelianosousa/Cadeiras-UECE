@@ -11,48 +11,24 @@ module.exports = class Environment {
     robot_position_column = 0,
     robot_position_line = 0
   ) {
-    this.quantity_spaces = quantity_spaces;
-    this.spaces = Math.matrix();
-    this.spacesBackup = Math.matrix();
+    this.quantity_spaces       = quantity_spaces;
+    this.spaces                = Math.matrix();
     this.robot_position_column = robot_position_column;
-    this.robot_position_line = robot_position_line;
-    this.robot = robot;
+    this.robot_position_line   = robot_position_line;
+    this.robot                 = robot;
     this.fill_spaces();
   }
 
   fill_spaces() {
-    for (let i = 0; i < this.quantity_spaces; i++) {
-      for (let j = 0; j < this.quantity_spaces; j++) {
-        const random = parseInt(Math.random() * 2);
-        this.spaces.set([i, j], new Room(random, [i, j], this.spaces));
-
-        this.spacesBackup.set(
-          [i, j],
-          new Room(random, [i, j], this.spacesBackup)
-        );
+    for (let line = 0; line < this.quantity_spaces; line++) {
+      for (let column = 0; column < this.quantity_spaces; column++) {
+        const state_room = parseInt(Math.random() * 2);
+        this.spaces.set([line, column], new Room(state_room, [line, column], this.spaces));
       }
     }
   }
 
-  show_spaces() {
-    this.spaces.forEach(function (space, index) {
-      console.log("state room:", space.state_room, "position:", index);
-    });
-  }
-
   get_spaces() {
     return this.spaces;
-  }
-
-  get_spaces_backup() {
-    return this.spacesBackup;
-  }
-
-  get_space(column, line) {
-    return this.spaces.get([column, line]);
-  }
-
-  set_spaces(spaces) {
-    this.spaces = spaces;
   }
 };
